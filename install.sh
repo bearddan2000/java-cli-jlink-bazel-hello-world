@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 basefile="install"
 logfile="general.log"
 timestamp=`date '+%Y-%m-%d %H:%M:%S'`
@@ -61,22 +62,6 @@ function docker-check() {
 
 }
 
-function docker-compose-check() {
-  scope="docker-compose-check"
-  info_base="[$timestamp INFO]: $basefile::$scope"
-  cmd=`docker-compose -v`
-
-  echo "$info_base started" >> $logfile
-
-  if [ -z "$cmd" ]; then
-    echo "$info_base docker-compose not installed"
-    echo "$info_base docker-compose not installed" >> $logfile
-  fi
-
-  echo "$info_base ended" >> $logfile
-  echo "================" >> $logfile
-
-}
 function usage() {
     echo ""
     echo "Usage: "
@@ -86,10 +71,10 @@ function usage() {
     echo "-h: Display this help and exit."
     echo ""
 }
-
 function start-up(){
 
     scope="start-up"
+
     docker_img_name=`head -n 1 README.md | sed 's/# //'`
     info_base="[$timestamp INFO]: $basefile::$scope"
 
@@ -98,14 +83,10 @@ function start-up(){
     echo "$info_base build image" >> $logfile
 
     echo "$info_base running image" >> $logfile
+    
+    sudo docker build -t $docker_img_name .
 
-    sudo rm -R bin/*root bin/out
-
-    docker run -it --rm \
-    -v $(pwd)/bin:/tmp \
-    -w /tmp \
-    nightscape/scala-mill \
-    mill Main
+    sudo docker run --rm $docker_img_name
 
     echo "$info_base ended" >> $logfile
 
@@ -114,14 +95,9 @@ function start-up(){
 function tear-down(){
 
     scope="tear-down"
-    docker_img_name=`head -n 1 README.md | sed 's/# //'`
     info_base="[$timestamp INFO]: $basefile::$scope"
 
     echo "$info_base started" >> $logfile
-
-    docker_stop=`sudo docker ps | grep ${docker_img_name} | cut -d ' ' -f 1`
-
-    sudo docker stop $docker_stop
 
     echo "$info_base services removed" >> $logfile
 
@@ -130,10 +106,8 @@ function tear-down(){
     echo "================" >> $logfile
 }
 
-
 root-check
 docker-check
-docker-compose-check
 
 while getopts ":udh" opts; do
   case $opts in

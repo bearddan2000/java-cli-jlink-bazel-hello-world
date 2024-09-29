@@ -1,14 +1,15 @@
-# java-cli-millbuild-erath-sieve
+# java-cli-jlink-bazel-hello-world
 
 ## Description
-Given a number N, print all prime numbers smaller than N.
+Demo of bazel build.
 
 ## Tech stack
+- jlink
 - java
-- mill
+- bazel
 
 ## Docker stack
-- nightscape/scala-mill
+- l.gcr.io/google/bazel:latest
 
 ## To run
 `sudo ./install.sh -u`
